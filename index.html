@@ -3,47 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <title>لوحة التحكم</title>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
-    body { font-family: Tahoma; text-align: center; margin-top: 50px; }
-    button { padding: 15px 25px; font-size: 20px; margin-top: 20px; }
-    h2 { font-size: 30px; }
+    body { font-family: Arial; text-align: center; margin-top: 50px; direction: rtl; }
+    button { padding: 20px 40px; font-size: 24px; margin-top: 20px; }
+    #status { font-size: 28px; margin-top: 40px; }
   </style>
 </head>
 <body>
-  <h1>لوحة التحكم</h1>
-  <div id="display"></div>
-  <button onclick="next()">التالي ➡️</button>
+  <h1>نظام الحلاق - لوحة التحكم</h1>
+  <button onclick="next()">التالي</button>
+  <div id="status"></div>
 
   <script>
-    const firebaseConfig = {
-      databaseURL: "https://coiffeur-77158-default-rtdb.firebaseio.com/"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
+    const db = "https://coiffeur-77158-default-rtdb.firebaseio.com/";
 
-    function update() {
-      db.ref("current").once("value", snap => {
-        const current = snap.val() || 0;
-        db.ref("queue").once("value", snapshot => {
-          const data = snapshot.val() || {};
-          const total = Object.keys(data).length;
-          const remaining = total - current;
-          document.getElementById("display").innerHTML =
-            `<h2>الرقم الحالي: ${current}</h2>` +
-            `<p>عدد المتبقين: ${remaining}</p>`;
-        });
+    async function next() {
+      const res = await fetch(db + ".json");
+      const data = await res.json();
+      let queue = data?.queue || [];
+      if (queue.length === 0) return;
+
+      let current = queue.shift();
+      await fetch(db + ".json", {
+        method: "PATCH",
+        body: JSON.stringify({ current, queue })
       });
+      update();
     }
 
-    function next() {
-      db.ref("current").transaction(current => (current || 0) + 1);
-      setTimeout(update, 500);
+    async function update() {
+      const res = await fetch(db + ".json");
+      const data = await res.json();
+      const current = data?.current || 0;
+      const remaining = data?.queue?.length || 0;
+      document.getElementById("status").innerHTML = `
+        الرقم الحالي: <strong>${current}</strong><br>
+        المتبقين: <strong>${remaining}</strong>
+      `;
     }
 
+    setInterval(update, 2000);
     update();
-    setInterval(update, 5000);
   </script>
 </body>
 </html>
