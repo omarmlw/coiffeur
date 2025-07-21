@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>لوحة التحكم</title>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  </head>
+  <body style="text-align: center; padding-top: 100px; font-family: sans-serif;">
+    <h2>🔧 إرسال رقم الزبون</h2>
+    <input type="number" id="number" placeholder="أدخل رقم الزبون" style="font-size: 24px; padding: 10px;" />
+    <br /><br />
+    <button onclick="send()" style="font-size: 24px; padding: 10px 30px;">إرسال</button>
+
+    <script>
+      const firebaseConfig = {
+        databaseURL: "https://coiffeur-77158-default-rtdb.firebaseio.com/"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      function send() {
+        const value = document.getElementById("number").value;
+        db.ref("display/current").set(value);
+      }
+    </script>
+  </body>
+</html>
