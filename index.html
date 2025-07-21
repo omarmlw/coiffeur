@@ -1,55 +1,49 @@
-<!-- index.html في مجلد coiffeur -->
 <!DOCTYPE html>
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة التحكم - الحلاق</title>
+  <title>لوحة التحكم</title>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
   <style>
-    body {
-      font-family: Arial;
-      text-align: center;
-      padding-top: 100px;
-      background: #f9f9f9;
-    }
-    input {
-      font-size: 24px;
-      padding: 10px;
-      width: 200px;
-    }
-    button {
-      font-size: 24px;
-      padding: 10px 20px;
-      margin-top: 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
+    body { font-family: Tahoma; text-align: center; margin-top: 50px; }
+    button { padding: 15px 25px; font-size: 20px; margin-top: 20px; }
+    h2 { font-size: 30px; }
   </style>
 </head>
 <body>
-  <h1>🎛️ لوحة التحكم</h1>
-  <input type="number" id="numberInput" placeholder="أدخل الرقم">
-  <br>
-  <button onclick="updateNumber()">تحديث الرقم</button>
+  <h1>لوحة التحكم</h1>
+  <div id="display"></div>
+  <button onclick="next()">التالي ➡️</button>
 
   <script>
-    // إعداد Firebase
-    var firebaseConfig = {
+    const firebaseConfig = {
       databaseURL: "https://coiffeur-77158-default-rtdb.firebaseio.com/"
     };
     firebase.initializeApp(firebaseConfig);
-    var db = firebase.database();
+    const db = firebase.database();
 
-    function updateNumber() {
-      var num = document.getElementById("numberInput").value;
-      if (num !== "") {
-        db.ref("display").set({ current: num });
-        alert("تم تحديث الرقم إلى " + num);
-      }
+    function update() {
+      db.ref("current").once("value", snap => {
+        const current = snap.val() || 0;
+        db.ref("queue").once("value", snapshot => {
+          const data = snapshot.val() || {};
+          const total = Object.keys(data).length;
+          const remaining = total - current;
+          document.getElementById("display").innerHTML =
+            `<h2>الرقم الحالي: ${current}</h2>` +
+            `<p>عدد المتبقين: ${remaining}</p>`;
+        });
+      });
     }
+
+    function next() {
+      db.ref("current").transaction(current => (current || 0) + 1);
+      setTimeout(update, 500);
+    }
+
+    update();
+    setInterval(update, 5000);
   </script>
 </body>
 </html>
