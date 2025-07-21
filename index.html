@@ -1,29 +1,55 @@
+<!-- index.html في مجلد coiffeur -->
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>لوحة التحكم</title>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-  </head>
-  <body style="text-align: center; padding-top: 100px; font-family: sans-serif;">
-    <h2>🔧 إرسال رقم الزبون</h2>
-    <input type="number" id="number" placeholder="أدخل رقم الزبون" style="font-size: 24px; padding: 10px;" />
-    <br /><br />
-    <button onclick="send()" style="font-size: 24px; padding: 10px 30px;">إرسال</button>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>لوحة التحكم - الحلاق</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial;
+      text-align: center;
+      padding-top: 100px;
+      background: #f9f9f9;
+    }
+    input {
+      font-size: 24px;
+      padding: 10px;
+      width: 200px;
+    }
+    button {
+      font-size: 24px;
+      padding: 10px 20px;
+      margin-top: 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎛️ لوحة التحكم</h1>
+  <input type="number" id="numberInput" placeholder="أدخل الرقم">
+  <br>
+  <button onclick="updateNumber()">تحديث الرقم</button>
 
-    <script>
-      const firebaseConfig = {
-        databaseURL: "https://coiffeur-77158-default-rtdb.firebaseio.com/"
-      };
+  <script>
+    // إعداد Firebase
+    var firebaseConfig = {
+      databaseURL: "https://coiffeur-77158-default-rtdb.firebaseio.com/"
+    };
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database();
 
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
-
-      function send() {
-        const value = document.getElementById("number").value;
-        db.ref("display/current").set(value);
+    function updateNumber() {
+      var num = document.getElementById("numberInput").value;
+      if (num !== "") {
+        db.ref("display").set({ current: num });
+        alert("تم تحديث الرقم إلى " + num);
       }
-    </script>
-  </body>
+    }
+  </script>
+</body>
 </html>
